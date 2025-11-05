@@ -1,36 +1,35 @@
-
 try {
   // Using the exact curl pattern you provided
   const response = await fetch(
-	"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
-	{
-	  method: "POST",
-	  headers: {
-		"x-goog-api-key": apiKey,
-		"Content-Type": "application/json",
-	  },
-	  body: JSON.stringify({
-		contents: [
-		  {
-			parts: [
-			  {
-				text: prompt,
-			  },
-			],
-		  },
-		],
-	  }),
-	}
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+    {
+      method: "POST",
+      headers: {
+        "x-goog-api-key": apiKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              {
+                text: prompt,
+              },
+            ],
+          },
+        ],
+      }),
+    }
   );
 
   if (!response.ok) {
-	const errorData = await response.json();
-	throw new Error(
-	  "API Error: " +
-		response.status +
-		" - " +
-		(errorData.error?.message || "Unknown error")
-	);
+    const errorData = await response.json();
+    throw new Error(
+      "API Error: " +
+        response.status +
+        " - " +
+        (errorData.error?.message || "Unknown error")
+    );
   }
 
   const data = await response.json();
@@ -39,44 +38,41 @@ try {
   const resumeHTML = data.candidates[0].content.parts[0].text;
 
   // Clean up the response (remove markdown code blocks if present)
-  let cleanHTML = resumeHTML
-	.replace(/```html\n?/g, "")
-	.replace(/```\n?/g, "");
+  let cleanHTML = resumeHTML.replace(/```html\n?/g, "").replace(/```\n?/g, "");
 
   document.getElementById("resumePreview").innerHTML = cleanHTML;
 } catch (error) {
   alert(
-	"Error generating resume: " +
-	  error.message +
-	  "\n\nPlease check your API key and try again."
+    "Error generating resume: " +
+      error.message +
+      "\n\nPlease check your API key and try again."
   );
   console.error("Error:", error);
 } finally {
   document.getElementById("loading").classList.remove("active");
   this.disabled = false;
 }
-});
 
 // Download PDF Button
 document.getElementById("downloadBtn").addEventListener("click", function () {
-window.print();
+  window.print();
 });
 
 // Copy HTML Button
 document.getElementById("copyBtn").addEventListener("click", function () {
-const resumeContent = document.getElementById("resumePreview").innerHTML;
+  const resumeContent = document.getElementById("resumePreview").innerHTML;
 
-if (!resumeContent || resumeContent.includes("Fill out the form")) {
-alert("Please generate a resume first!");
-return;
-}
+  if (!resumeContent || resumeContent.includes("Fill out the form")) {
+    alert("Please generate a resume first!");
+    return;
+  }
 
-const fullHTML =
-'<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Resume</title>\n    <link rel="stylesheet" href="resume.css">\n</head>\n<body>\n' +
-resumeContent +
-"\n</body>\n</html>";
+  const fullHTML =
+    '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Resume</title>\n    <link rel="stylesheet" href="resume.css">\n</head>\n<body>\n' +
+    resumeContent +
+    "\n</body>\n</html>";
 
-const resumeCSS = `body {
+  const resumeCSS = `body {
 font-family: 'Computer Modern', 'Times New Roman', serif;
 line-height: 1.4;
 font-size: 11pt;
@@ -181,25 +177,25 @@ margin: 5px 0;
 font-weight: bold;
 }`;
 
-// Create a downloadable package
-const blob = new Blob(
-[
-  "=== RESUME HTML (save as resume.html) ===\n\n",
-  fullHTML,
-  "\n\n=== RESUME CSS (save as resume.css) ===\n\n",
-  resumeCSS,
-],
-{ type: "text/plain" }
-);
+  // Create a downloadable package
+  const blob = new Blob(
+    [
+      "=== RESUME HTML (save as resume.html) ===\n\n",
+      fullHTML,
+      "\n\n=== RESUME CSS (save as resume.css) ===\n\n",
+      resumeCSS,
+    ],
+    { type: "text/plain" }
+  );
 
-const url = URL.createObjectURL(blob);
-const a = document.createElement("a");
-a.href = url;
-a.download = "resume-files.txt";
-a.click();
-URL.revokeObjectURL(url);
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "resume-files.txt";
+  a.click();
+  URL.revokeObjectURL(url);
 
-alert(
-"Resume files downloaded! The TXT file contains both HTML and CSS. Copy each section into separate files:\n\n1. resume.html\n2. resume.css"
-);
-
+  alert(
+    "Resume files downloaded! The TXT file contains both HTML and CSS. Copy each section into separate files:\n\n1. resume.html\n2. resume.css"
+  );
+});
